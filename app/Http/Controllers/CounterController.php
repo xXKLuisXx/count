@@ -35,16 +35,27 @@ class CounterController extends Controller
      */
     public function store(Request $request)
     {
-        $counterObj = new Counter();
-        
-        $counterObj->token = $request->token;
-        $counterObj->count = $request->input('count');
-        
-        $counterObj->save();
-
-        
+        if($request->input('count') > 0){
+            if(Counter::all()->sum('count') < 1500){
+                $counterObj = new Counter();
+    
+                $counterObj->token = $request->token;
+                $counterObj->count = $request->input('count');
+                
+                $counterObj->save();
+            }
+        }else{
+            $counterObj = new Counter();
+            
+            $counterObj->token = $request->token;
+            $counterObj->count = $request->input('count');
+            
+            $counterObj->save();
+        }
+        $free = 1500 - Counter::all()->sum('count');
         $counter = Counter::all()->sum('count');
-        return response()->json($counter);
+        $response = array("free" => $free, "counter" => $counter);
+        return response()->json($response);
     }
 
     /**
