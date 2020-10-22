@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Configuration;
 use App\Models\Counter;
+use App\Models\Staff;
+use App\Models\Provider;
 use Illuminate\Http\Request;
 
 class CounterController extends Controller
@@ -14,7 +17,23 @@ class CounterController extends Controller
      */
     public function index()
     {
-        //
+    }
+
+    public function contadores()
+    {
+        $aforo = Configuration::where('id', 1)->first();
+        if ($aforo == null) {
+            $config = new Configuration();
+            $config->id = 1;
+            $config->aforo = 1500;
+            $config->save();
+
+            $aforo = Configuration::where('id', 1)->first();
+        }
+        $free = $aforo->aforo - Counter::where('contabilizado', false)->sum('count');
+        $counter = Counter::where('contabilizado', false)->sum('count');
+        $response = array("free" => $free, "counter" => $counter);
+        return response()->json($response);
     }
 
     /**
@@ -35,26 +54,80 @@ class CounterController extends Controller
      */
     public function store(Request $request)
     {
-        if($request->input('count') > 0){
-            if(Counter::all()->sum('count') < 1500){
-                $counterObj = new Counter();
-    
-                $counterObj->token = $request->token;
-                $counterObj->count = $request->input('count');
-                
-                $counterObj->save();
+        if ($request->token != null) {
+            $aforo = Configuration::where('id', 1)->first();
+            if ($aforo == null) {
+                $config = new Configuration();
+                $config->id = 1;
+                $config->aforo = 1500;
+                $config->save();
+
+                $aforo = Configuration::where('id', 1)->first();
             }
-        }else{
-            $counterObj = new Counter();
-            
-            $counterObj->token = $request->token;
-            $counterObj->count = $request->input('count');
-            
-            $counterObj->save();
+            $bandera = false;
+
+            if ($request->input('count') > 0) {
+                $status_ingreso = 1;
+                $mensaje_entrada_salida = 'Entrada verificada con éxito';
+            } else {
+                $status_ingreso = 0;
+                $mensaje_entrada_salida = 'Salida verificada con éxito';
+            }
+
+            if ($request->token == 'INGRESOEXPOESPACIO15') {
+                $bandera = true;
+            } else {
+                if (Counter::where('contabilizado', false)->sum('count') < $aforo->aforo) {
+                    $respuestaStaff = $this->validarStaff($request->token, $status_ingreso);
+                    if ($respuestaStaff['valido']) {
+                        $bandera = true;
+                    } else {
+                        $free = $aforo->aforo - Counter::where('contabilizado', false)->sum('count');
+                        $counter = Counter::where('contabilizado', false)->sum('count');
+                        $response = array("free" => $free, "counter" => $counter, 'status' => 'error', 'mensaje' => $respuestaStaff['mensaje']);
+
+                        return response()->json($response);
+                    }
+                } else {
+                    $free = $aforo->aforo - Counter::where('contabilizado', false)->sum('count');
+                    $counter = Counter::where('contabilizado', false)->sum('count');
+                    $response = array("free" => $free, "counter" => $counter, 'status' => 'error', 'mensaje' => 'Entrada no verificada, cupo lleno');
+
+                    return response()->json($response);
+                }
+            }
+
+            if ($bandera) {
+                if ($request->input('count') > 0) {
+                    if (Counter::where('contabilizado', false)->sum('count') < $aforo->aforo) {
+                        $counterObj = new Counter();
+
+                        $counterObj->token = $request->token;
+                        $counterObj->count = $request->input('count');
+
+                        $counterObj->save();
+                    } else {
+                        $free = $aforo->aforo - Counter::where('contabilizado', false)->sum('count');
+                        $counter = Counter::where('contabilizado', false)->sum('count');
+                        $response = array("free" => $free, "counter" => $counter, 'status' => 'error', 'mensaje' => 'Entrada no verificada, cupo lleno');
+
+                        return response()->json($response);
+                    }
+                } else {
+                    if (Counter::where('contabilizado', false)->sum('count') > 0) {
+                        $counterObj = new Counter();
+
+                        $counterObj->token = $request->token;
+                        $counterObj->count = $request->input('count');
+
+                        $counterObj->save();
+                    }
+                }
+            }
         }
-        $free = 1500 - Counter::all()->sum('count');
-        $counter = Counter::all()->sum('count');
-        $response = array("free" => $free, "counter" => $counter);
+        $free = $aforo->aforo - Counter::where('contabilizado', false)->sum('count');
+        $counter = Counter::where('contabilizado', false)->sum('count');
+        $response = array("free" => $free, "counter" => $counter, 'status' => 'success', 'mensaje' => $mensaje_entrada_salida);
         return response()->json($response);
     }
 
@@ -101,5 +174,35 @@ class CounterController extends Controller
     public function destroy(Counter $counter)
     {
         //
+    }
+
+    public function validarStaff($token, $status_ingreso)
+    {
+        $respuestaStaff = array();
+        $staff = Staff::where('folio', $token)->first();
+        if ($staff == null) {
+            $respuestaStaff['mensaje'] = 'QR no registrado ';
+            $respuestaStaff['valido'] = false;
+
+            return $respuestaStaff;
+        }
+
+        $provider = Provider::where('provider_id', $staff->provider_id)->first();
+        $staff_dentro = Staff::where('provider_id', $staff->provider_id)->sum('dentro');
+
+        if ($staff_dentro >= $provider->limite_dentro) {
+            $respuestaStaff['mensaje'] = 'El Staff del cliente está lleno';
+            $respuestaStaff['valido'] = false;
+        } else if ($staff->dentro == $status_ingreso) {
+            $respuestaStaff['mensaje'] = 'Acción ya realizada';
+            $respuestaStaff['valido'] = false;
+        } else {
+            $respuestaStaff['mensaje'] = 'Entrada verificada con éxito ';
+            $respuestaStaff['valido'] = true;
+            $staff->dentro = $status_ingreso;
+            $staff->save();
+        }
+
+        return $respuestaStaff;
     }
 }

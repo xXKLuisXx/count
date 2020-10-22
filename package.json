@@ -19,6 +19,7 @@
     },
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.15.1",
-        "tailwindcss": "^1.9.3"
+        "tailwindcss": "^1.9.3",
+        "toastr": "^2.1.4"
     }
 }

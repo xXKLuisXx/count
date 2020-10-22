@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="_token" content="{{ csrf_token() }}" />
-    <title>Entradas</title>
+    <title>Configuración de Entradas</title>
 
     <link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}">
     <link href="{{asset('css/toastr.css')}}" rel="stylesheet"/>
@@ -79,49 +79,30 @@
                     </button>
                 </div>
                 -->
-                <div class="flex items-center border-b border-pink-400 py-2" style="position: absolute; right: 0;">
-                    <input id="tokenValue" type="text" placeholder="Token"
-                        class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none">
-                    <button id="tokenManual"
+                <div class="flex items-center border-b text-white py-2" style="position: absolute; left: 0;">
+                    <label for="tokenValue">Aforo</label>
+                    <input id="tokenValue" type="text" placeholder="Aforo"
+                        class="appearance-none bg-transparent border-none focus:outline-none leading-tight mr-3 px-2 py-1 w-full" value="{{$conf->aforo}}">
+                    <button id="guardarConfig"
                         class="flex-shrink-0 bg-pink-400 hover:bg-pink-600 border-pink-400 hover:border-pink-600 text-sm border-4 text-white py-1 px-2 rounded"
                         type="button">
-                        Nuevo
+                        Actualizar Información de aforo
+                    </button>
+                    <button id="nuevoDia"
+                        class="ml-2 flex-shrink-0 bg-pink-400 hover:bg-pink-600 border-pink-400 hover:border-pink-600 text-sm border-4 text-white py-1 px-2 rounded"
+                        type="button">
+                        Iniciar un nuevo dia
                     </button>
                 </div>
             </div>
         </nav>
     </div>
-    <main class="mt-10 mx-auto max-w-screen-xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28"
-        style="text-align-last: center">
-        <div class="sm:text-center lg:text-left">
-            <h2 id="tokenId"
-                class="text-4xl tracking-tight leading-10 font-extrabold text-pink-800 sm:text-5xl sm:leading-none md:text-6xl" style="display: none;">
-                Token
-            </h2>
-            <br>
-            <h3
-                class="text-2xl tracking-tight leading-10 font-extrabold text-black sm:text-3xl sm:leading-none md:text-4xl">
-                <span id="freeId" class="text-white">0</span> <span class="text-white">Disponibles</span>
-            </h3>
-            <h2
-                class="text-4xl tracking-tight leading-10 font-extrabold text-black sm:text-5xl sm:leading-none md:text-6xl">
-                <span id="counterId" class="text-white">0</span> <span class="text-white">Asistentes</span>
-            </h2>
-            <h4 class="text-5xl">
-                <i id="iconCheck" class="fas fa-angle-double-up"></i>
-            </h4>
-        </div>
-    </main>
-    <div id="ohsnap"></div>
 </body>
 <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
     crossorigin="anonymous"></script>
+    <script src="{{asset('js/ohsnap.js')}}"></script>
     <script src="{{asset('js/toastr.min.js')}}"></script>
 <script defer>
-    let sumCount = 1;
-    let entry = true
-    let token = "";
-
     toastr.options = {
     "closeButton": false,
     "debug": false,
@@ -139,50 +120,20 @@
     "showMethod": "fadeIn",
     "hideMethod": "fadeOut"
     }
-
     $(document).ready(function() {
-        inicializarContadores();
-        let tokenText = document.getElementById("tokenId");
-        let counterText = document.getElementById("counterId");
-        let freeText = document.getElementById("freeId");
-        let iconClass = document.getElementById("iconCheck");
         let inputToken = document.getElementById("tokenValue");
-        document.addEventListener("keydown", function(e) {
-            char = e.which || e.keyCode;
-            var key = e.keyCode;
-            token += String.fromCharCode(char);
-            if (key == 13) {
-                sumCountRequest(token);
-                tokenText.textContent = token;
-                token = "";
-            }
-        });
 
-        jQuery('#iconCheck').click(function(e) {
-            if (sumCount > 0) {
-                iconClass.classList.remove("fa-angle-double-up");
-                iconClass.classList.add("fa-angle-double-down");
-                sumCount = -1;
-            } else {
-                iconClass.classList.remove("fa-angle-double-down");
-                iconClass.classList.add("fa-angle-double-up");
-                sumCount = 1;
-            }
-
-        });
-
-        jQuery("#tokenManual").click(function(e) {
+        jQuery("#nuevoDia").click(function(e) {
             e.preventDefault();
-            sumCountRequest(inputToken.value);
-            tokenText.textContent = inputToken.value;
-            inputToken.value = "";
+            nuevoDia();
         });
 
-        function formatNumber(num) {
-            return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
-        }
+        jQuery("#guardarConfig").click(function(e) {
+            e.preventDefault();
+            guardarInformacion(inputToken.value);
+        });
 
-        function sumCountRequest(tokenVar) {
+        function nuevoDia(){
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
@@ -190,38 +141,43 @@
             });
 
             jQuery.ajax({
-                url: "{{ route('counter.store') }}",
+                url: "newDia",
                 method: 'POST',
                 data: {
-                    token: tokenVar,
-                    count: sumCount,
                 },
                 success: function(result) {
                     if(result.status=='success'){
                         toastr.success(result.mensaje)
+                        //ohSnap(result.mensaje, {color: 'green'})
                     } else {
                         toastr.error(result.mensaje)
+                        //ohSnap(result.mensaje, {color: 'red'})
                     }
-                    freeText.innerText = formatNumber(result.free);
-                    counterText.innerText = formatNumber(result.counter);
                 }
             });
         }
 
-        function inicializarContadores(){
+        function guardarInformacion(tokenVar) {
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
                 }
             });
+
             jQuery.ajax({
-                url: "contadores",
+                url: "saveData",
                 method: 'POST',
                 data: {
+                    aforo: tokenVar
                 },
                 success: function(result) {
-                    freeText.innerText = formatNumber(result.free);
-                    counterText.innerText = formatNumber(result.counter);
+                    if(result.status=='success'){
+                        toastr.success(result.mensaje)
+                        //ohSnap(result.mensaje, {color: 'green'})
+                    } else {
+                        toastr.error(result.mensaje)
+                        //ohSnap(result.mensaje, {color: 'red'})
+                    }
                 }
             });
         }
