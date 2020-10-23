@@ -151,11 +151,53 @@
         document.addEventListener("keydown", function(e) {
             char = e.which || e.keyCode;
             var key = e.keyCode;
-            token += String.fromCharCode(char);
-            if (key == 13) {
+            /*
+                console.log("char "+String.fromCharCode(char))
+                console.log("e "+e.which || e.keyCode)
+                console.log("key "+key)
+            */
+            if(key == 20 || key == 144){
+                console.log("caracter especial")
+            } else if(key >= 96 && key <= 105){
+                switch(key){
+                    case 96:
+                        token += '0';
+                    break;
+                    case 97:
+                        token += '1';
+                    break;
+                    case 98:
+                        token += '2';
+                    break;
+                    case 99:
+                        token += '3';
+                    break;
+                    case 100:
+                        token += '4';
+                    break;
+                    case 101:
+                        token += '5';
+                    break;
+                    case 102:
+                        token += '6';
+                    break;
+                    case 103:
+                        token += '7';
+                    break;
+                    case 104:
+                        token += '8';
+                    break;
+                    case 105:
+                        token += '9';
+                    break;
+                }
+            }
+            else if (key == 13) {
                 sumCountRequest(token);
                 tokenText.textContent = token;
                 token = "";
+            } else {
+                token += String.fromCharCode(char);
             }
         });
 
