@@ -57,7 +57,7 @@
             <div class="flex items-center flex-grow flex-shrink-0 lg:flex-grow-0">
                 <div class="flex items-center justify-between w-full md:w-auto">
                     <a aria-label="Home">
-                        <img class="h-8 w-auto sm:h-10" src="{{ asset('storage/Logo.png') }}" alt="Logo">
+                        <img class="h-8 w-auto sm:h-10" src="{{ asset('Logo.png') }}" alt="Logo">
                     </a>
                     <div class="-mr-2 flex items-center md:hidden">
                         <button type="button"
@@ -92,6 +92,11 @@
                         class="ml-2 flex-shrink-0 bg-pink-400 hover:bg-pink-600 border-pink-400 hover:border-pink-600 text-sm border-4 text-white py-1 px-2 rounded"
                         type="button">
                         Iniciar un nuevo dia
+                    </button>
+                    <button id="importarData"
+                    class="ml-2 flex-shrink-0 bg-pink-400 hover:bg-pink-600 border-pink-400 hover:border-pink-600 text-sm border-4 text-white py-1 px-2 rounded"
+                    type="button">
+                        Importar Información de staff
                     </button>
                 </div>
             </div>
@@ -128,6 +133,11 @@
             nuevoDia();
         });
 
+        jQuery("#importarData").click(function(e) {
+            e.preventDefault();
+            importarData()
+        });
+
         jQuery("#guardarConfig").click(function(e) {
             e.preventDefault();
             guardarInformacion(inputToken.value);
@@ -146,6 +156,48 @@
                 data: {
                 },
                 success: function(result) {
+                    if(result.status=='success'){
+                        toastr.success(result.mensaje)
+                        //ohSnap(result.mensaje, {color: 'green'})
+                    } else {
+                        toastr.error(result.mensaje)
+                        //ohSnap(result.mensaje, {color: 'red'})
+                    }
+                }
+            });
+        }
+
+        function importarData(){
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
+                }
+            });
+
+            jQuery.ajax({
+                url: "https://brideadvisor.mx/api/exportData",
+                method: 'POST',
+                data: {
+                    'event_id': 12
+                },
+                success: function(result) {
+                    jQuery.ajax({
+                        url: "importarData",
+                        method: 'POST',
+                        data: {
+                            'provider': result.providers,
+                            'staff': result.staff
+                        },
+                        success: function(result) {
+                            if(result.status=='success'){
+                                toastr.success(result.mensaje)
+                                //ohSnap(result.mensaje, {color: 'green'})
+                            } else {
+                                toastr.error(result.mensaje)
+                                //ohSnap(result.mensaje, {color: 'red'})
+                            }
+                        }
+                    });
                     if(result.status=='success'){
                         toastr.success(result.mensaje)
                         //ohSnap(result.mensaje, {color: 'green'})

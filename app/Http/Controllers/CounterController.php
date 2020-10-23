@@ -25,7 +25,7 @@ class CounterController extends Controller
         if ($aforo == null) {
             $config = new Configuration();
             $config->id = 1;
-            $config->aforo = 1500;
+            $config->aforo = 1510;
             $config->save();
 
             $aforo = Configuration::where('id', 1)->first();
@@ -59,7 +59,7 @@ class CounterController extends Controller
             if ($aforo == null) {
                 $config = new Configuration();
                 $config->id = 1;
-                $config->aforo = 1500;
+                $config->aforo = 1510;
                 $config->save();
 
                 $aforo = Configuration::where('id', 1)->first();

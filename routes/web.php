@@ -21,7 +21,7 @@ Route::get('/', function () {
 });
 
 Route::get('/config', function () {
-    $conf = Configuration::where('id',1)->first();
+    $conf = Configuration::where('id', 1)->first();
     return view('config')->with(['conf' => $conf]);
 });
 
@@ -29,3 +29,7 @@ Route::resource('counter', CounterController::class);
 Route::post('contadores', [CounterController::class, 'contadores']);
 Route::post('saveData', [ConfigurationController::class, 'saveData']);
 Route::post('newDia', [ConfigurationController::class, 'newDia']);
+Route::post('importarData', [ConfigurationController::class, 'importarData']);
+Route::get('directorio', function () {
+    return view('directorio');
+});

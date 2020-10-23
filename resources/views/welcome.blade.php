@@ -57,7 +57,7 @@
             <div class="flex items-center flex-grow flex-shrink-0 lg:flex-grow-0">
                 <div class="flex items-center justify-between w-full md:w-auto">
                     <a aria-label="Home">
-                        <img class="h-8 w-auto sm:h-10" src="{{ asset('storage/Logo.png') }}" alt="Logo">
+                        <img class="h-8 w-auto sm:h-10" src="{{ asset('Logo.png') }}" alt="Logo">
                     </a>
                     <div class="-mr-2 flex items-center md:hidden">
                         <button type="button"
@@ -142,6 +142,7 @@
 
     $(document).ready(function() {
         inicializarContadores();
+        setInterval(inicializarContadores, 60000);
         let tokenText = document.getElementById("tokenId");
         let counterText = document.getElementById("counterId");
         let freeText = document.getElementById("freeId");
