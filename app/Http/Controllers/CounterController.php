@@ -32,7 +32,7 @@ class CounterController extends Controller
         }
         $free = $aforo->aforo - Counter::where('contabilizado', false)->sum('count');
         $counter = Counter::where('contabilizado', false)->sum('count');
-        $response = array("free" => $free, "counter" => $counter);
+        $response = array("free" => $free, "counter" => $counter, "aforoTotal" => $aforo->aforo );
         return response()->json($response);
     }
 
@@ -84,14 +84,14 @@ class CounterController extends Controller
                     } else {
                         $free = $aforo->aforo - Counter::where('contabilizado', false)->sum('count');
                         $counter = Counter::where('contabilizado', false)->sum('count');
-                        $response = array("free" => $free, "counter" => $counter, 'status' => 'error', 'mensaje' => $respuestaStaff['mensaje']);
+                        $response = array("free" => $free, "counter" => $counter, 'status' => 'error', 'mensaje' => $respuestaStaff['mensaje'], "aforoTotal" => $aforo->aforo );
 
                         return response()->json($response);
                     }
                 } else {
                     $free = $aforo->aforo - Counter::where('contabilizado', false)->sum('count');
                     $counter = Counter::where('contabilizado', false)->sum('count');
-                    $response = array("free" => $free, "counter" => $counter, 'status' => 'error', 'mensaje' => 'Entrada no verificada, cupo lleno');
+                    $response = array("free" => $free, "counter" => $counter, 'status' => 'error', 'mensaje' => 'Entrada no verificada, cupo lleno', "aforoTotal" => $aforo->aforo );
 
                     return response()->json($response);
                 }
@@ -109,7 +109,7 @@ class CounterController extends Controller
                     } else {
                         $free = $aforo->aforo - Counter::where('contabilizado', false)->sum('count');
                         $counter = Counter::where('contabilizado', false)->sum('count');
-                        $response = array("free" => $free, "counter" => $counter, 'status' => 'error', 'mensaje' => 'Entrada no verificada, cupo lleno');
+                        $response = array("free" => $free, "counter" => $counter, 'status' => 'error', 'mensaje' => 'Entrada no verificada, cupo lleno', "aforoTotal" => $aforo->aforo );
 
                         return response()->json($response);
                     }
@@ -127,7 +127,7 @@ class CounterController extends Controller
         }
         $free = $aforo->aforo - Counter::where('contabilizado', false)->sum('count');
         $counter = Counter::where('contabilizado', false)->sum('count');
-        $response = array("free" => $free, "counter" => $counter, 'status' => 'success', 'mensaje' => $mensaje_entrada_salida);
+        $response = array("free" => $free, "counter" => $counter, 'status' => 'success', 'mensaje' => $mensaje_entrada_salida, "aforoTotal" => $aforo->aforo );
         return response()->json($response);
     }
 
@@ -190,7 +190,7 @@ class CounterController extends Controller
         $provider = Provider::where('provider_id', $staff->provider_id)->first();
         $staff_dentro = Staff::where('provider_id', $staff->provider_id)->sum('dentro');
 
-        if ($staff_dentro >= $provider->limite_dentro) {
+        if ($staff_dentro >= $provider->limite_dentro || !$status_ingreso) {
             $respuestaStaff['mensaje'] = 'El Staff del cliente está lleno';
             $respuestaStaff['valido'] = false;
         } else if ($staff->dentro == $status_ingreso) {

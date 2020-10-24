@@ -107,6 +107,10 @@
                 class="text-4xl tracking-tight leading-10 font-extrabold text-black sm:text-5xl sm:leading-none md:text-6xl">
                 <span id="counterId" class="text-white">0</span> <span class="text-white">Asistentes</span>
             </h2>
+            <h3
+                class="text-2xl tracking-tight leading-10 font-extrabold text-black sm:text-3xl sm:leading-none md:text-4xl">
+                <span id="aforoTotal" class="text-white">0</span> <span class="text-white">Aforo total</span>
+            </h3>
             <h4 class="text-5xl">
                 <i id="iconCheck" class="fas fa-angle-double-up"></i>
             </h4>
@@ -145,6 +149,7 @@
         let tokenText = document.getElementById("tokenId");
         let counterText = document.getElementById("counterId");
         let freeText = document.getElementById("freeId");
+        let aforoTotal = document.getElementById("aforoTotal");
         let iconClass = document.getElementById("iconCheck");
         let inputToken = document.getElementById("tokenValue");
         var numeros="0123456789";
@@ -270,6 +275,7 @@
                     }
                     freeText.innerText = formatNumber(result.free);
                     counterText.innerText = formatNumber(result.counter);
+                    aforoTotal.innerText = formatNumber(result.aforoTotal);
                 }
             });
         }
@@ -288,6 +294,7 @@
                 success: function(result) {
                     freeText.innerText = formatNumber(result.free);
                     counterText.innerText = formatNumber(result.counter);
+                    aforoTotal.innerText = formatNumber(result.aforoTotal);
                 }
             });
         }
