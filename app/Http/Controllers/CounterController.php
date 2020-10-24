@@ -190,7 +190,7 @@ class CounterController extends Controller
         $provider = Provider::where('provider_id', $staff->provider_id)->first();
         $staff_dentro = Staff::where('provider_id', $staff->provider_id)->sum('dentro');
 
-        if ($staff_dentro >= $provider->limite_dentro || !$status_ingreso) {
+        if ($staff_dentro >= $provider->limite_dentro && $status_ingreso) {
             $respuestaStaff['mensaje'] = 'El Staff del cliente está lleno';
             $respuestaStaff['valido'] = false;
         } else if ($staff->dentro == $status_ingreso) {

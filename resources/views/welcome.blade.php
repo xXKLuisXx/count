@@ -103,14 +103,14 @@
                 class="text-2xl tracking-tight leading-10 font-extrabold text-black sm:text-3xl sm:leading-none md:text-4xl">
                 <span id="freeId" class="text-white">0</span> <span class="text-white">Disponibles</span>
             </h3>
-            <h2
-                class="text-4xl tracking-tight leading-10 font-extrabold text-black sm:text-5xl sm:leading-none md:text-6xl">
-                <span id="counterId" class="text-white">0</span> <span class="text-white">Asistentes</span>
-            </h2>
             <h3
                 class="text-2xl tracking-tight leading-10 font-extrabold text-black sm:text-3xl sm:leading-none md:text-4xl">
                 <span id="aforoTotal" class="text-white">0</span> <span class="text-white">Aforo total</span>
             </h3>
+            <h2
+                class="text-4xl tracking-tight leading-10 font-extrabold text-black sm:text-5xl sm:leading-none md:text-6xl">
+                <span id="counterId" class="text-white">0</span> <span class="text-white">Asistentes</span>
+            </h2>
             <h4 class="text-5xl">
                 <i id="iconCheck" class="fas fa-angle-double-up"></i>
             </h4>
