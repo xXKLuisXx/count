@@ -114,8 +114,7 @@
     </main>
     <div id="ohsnap"></div>
 </body>
-<script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-    crossorigin="anonymous"></script>
+    <script src="{{asset('js/jquery-3.3.1.min.js')}}"></script>
     <script src="{{asset('js/toastr.min.js')}}"></script>
 <script defer>
     let sumCount = 1;
@@ -148,14 +147,17 @@
         let freeText = document.getElementById("freeId");
         let iconClass = document.getElementById("iconCheck");
         let inputToken = document.getElementById("tokenValue");
+        var numeros="0123456789";
+        var letras="abcdefghyjklmnñopqrstuvwxyz";
+
         document.addEventListener("keydown", function(e) {
             char = e.which || e.keyCode;
             var key = e.keyCode;
-            /*
-                console.log("char "+String.fromCharCode(char))
-                console.log("e "+e.which || e.keyCode)
-                console.log("key "+key)
-            */
+
+            console.log("char "+String.fromCharCode(char))
+            console.log("e "+e.which || e.keyCode)
+            console.log("key "+key)
+
             if(key == 20 || key == 144){
                 console.log("caracter especial")
             } else if(key >= 96 && key <= 105){
@@ -196,8 +198,10 @@
                 sumCountRequest(token);
                 tokenText.textContent = token;
                 token = "";
-            } else {
+            } else if(tiene_numeros(String.fromCharCode(char)) || tiene_letras(String.fromCharCode(char))){
                 token += String.fromCharCode(char);
+            } else {
+                // nada
             }
         });
 
@@ -220,6 +224,25 @@
             tokenText.textContent = inputToken.value;
             inputToken.value = "";
         });
+
+        function tiene_numeros(texto){
+            for(i=0; i<texto.length; i++){
+                if (numeros.indexOf(texto.charAt(i),0)!=-1){
+                    return 1;
+                }
+            }
+            return 0;
+        }
+
+        function tiene_letras(texto){
+            texto = texto.toLowerCase();
+            for(i=0; i<texto.length; i++){
+                if (letras.indexOf(texto.charAt(i),0)!=-1){
+                    return 1;
+                }
+            }
+            return 0;
+        }
 
         function formatNumber(num) {
             return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
