@@ -77,7 +77,7 @@ class CounterController extends Controller
             if ($request->token == 'INGRESOEXPOESPACIO15') {
                 $bandera = true;
             } else {
-                if (Counter::where('contabilizado', false)->sum('count') < $aforo->aforo) {
+                if (Counter::where('contabilizado', false)->sum('count') < $aforo->aforo || !$status_ingreso) {
                     $respuestaStaff = $this->validarStaff($request->token, $status_ingreso);
                     if ($respuestaStaff['valido']) {
                         $bandera = true;
@@ -99,7 +99,7 @@ class CounterController extends Controller
 
             if ($bandera) {
                 if ($request->input('count') > 0) {
-                    if (Counter::where('contabilizado', false)->sum('count') < $aforo->aforo) {
+                    if (Counter::where('contabilizado', false)->sum('count') < $aforo->aforo || !$status_ingreso) {
                         $counterObj = new Counter();
 
                         $counterObj->token = $request->token;

@@ -148,15 +148,15 @@
         let iconClass = document.getElementById("iconCheck");
         let inputToken = document.getElementById("tokenValue");
         var numeros="0123456789";
-        var letras="abcdefghyjklmnñopqrstuvwxyz";
+        var letras="abcdefghijklmnñopqrstuvwxyz";
 
         document.addEventListener("keydown", function(e) {
             char = e.which || e.keyCode;
             var key = e.keyCode;
 
-            console.log("char "+String.fromCharCode(char))
+            /*console.log("char "+String.fromCharCode(char))
             console.log("e "+e.which || e.keyCode)
-            console.log("key "+key)
+            console.log("key "+key)*/
 
             if(key == 20 || key == 144){
                 console.log("caracter especial")
